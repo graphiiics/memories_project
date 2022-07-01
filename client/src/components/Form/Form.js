@@ -20,6 +20,8 @@ function Form({ currentId, setCurrentId }) {
 
   const clear = () => {
     console.log('cleaning...');
+    setCurrentId(null);
+    setPostData({ creator: '', title: '', message: '', tags: '', selectedFile: ''});
   }
 
   const handleSubmit = (e) => {
@@ -30,8 +32,7 @@ function Form({ currentId, setCurrentId }) {
     }else{
       dispatch(createPost(postData));
     }
-
-
+    clear();
   }
 
   return (
@@ -40,7 +41,7 @@ function Form({ currentId, setCurrentId }) {
         <Typography
           variant='h6'
         >
-          Creating a Memory
+          {currentId ? 'Editing' : 'Creating' } a Memory
         </Typography>
         <TextField
           name='creator'
