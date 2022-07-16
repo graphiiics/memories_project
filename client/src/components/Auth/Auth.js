@@ -7,11 +7,14 @@ import { AUTH } from '../../constants/actionsTypes';
 import { Avatar, Button, Container, Grid, Icon, Typography, Paper } from '@material-ui/core';
 import { GoogleLogin } from 'react-google-login';
 import { gapi } from 'gapi-script';
-
 import Input from './Input';
+import { signin, signup } from '../../actions/auth';
+
+const initialState = { firstName: '' , lastName: '', email: '', password: '', confirmPassword: '' };
 
 const SignUp = () => {
     const classes = useStyles();
+    const [form, setForm] = useState(initialState);
     const [showPassword, setShowPassword] = useState(false);
     const [isSignup, setIsSignup] = useState(false);
     const dispatch = useDispatch();
@@ -20,12 +23,19 @@ const SignUp = () => {
 
     const handleShowPassword = () => setShowPassword(!showPassword);
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if(isSignup){
+            dispatch(signup(form, history));
+        }else{
+            dispatch(signin(form, history));
+        }
 
     };
 
-    const handleChange = () => {
-
+    const handleChange = (e) => {
+        setForm({...form, [e.target.name]: e.target.value});
     };
 
     const switchMode = () => {
