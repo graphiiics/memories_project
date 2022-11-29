@@ -5,15 +5,17 @@ import FileBase from 'react-file-base64';
 
 import useStyles from './styles';
 import { createPost, updatePost } from '../../actions/posts';
+import { useHistory } from 'react-router-dom';
 
 //GET THE CURRENT ID 
  
 function Form({ currentId, setCurrentId }) {
   const [postData, setPostData] = useState({ title: '', message: '', tags: '', selectedFile: ''});
-  const post = useSelector((state) => currentId ? state.posts.find((p) => p._id === currentId ) : null ); //TODO: search how this hooks works
+  const post = useSelector((state) => currentId ? state.posts.posts.find((p) => p._id === currentId ) : null ); //TODO: search how this hooks works
   const classes = useStyles();
   const dispatch = useDispatch();
   const user = JSON.parse(localStorage.getItem('profile'));
+  const history = useHistory(); 
 
   useEffect(() => {
     if(post) setPostData(post);
@@ -32,7 +34,7 @@ function Form({ currentId, setCurrentId }) {
     
     if(currentId === 0){
       console.log('create');
-      dispatch(createPost({...postData, name: user?.result?.name }));
+      dispatch(createPost({...postData, name: user?.result?.name }, history));
     }else{
       console.log('update');
       dispatch(updatePost(currentId, {...postData, name: user?.result?.name }));
@@ -51,7 +53,7 @@ function Form({ currentId, setCurrentId }) {
   }
 
   return (
-    <Paper className={classes.paper}>
+    <Paper className={classes.paper} elevation={6}>
       <form autoComplete='off' noValidate className={`${classes.root} ${classes.form}`} onSubmit={handleSubmit}>
         <Typography
           variant='h6'
