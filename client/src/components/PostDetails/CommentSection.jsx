@@ -6,47 +6,63 @@ import useStyles from './styles';
 import { commentPost } from '../../actions/posts';
 
 function CommentSection({ post }) {
-  console.log(post);
-  const classes = useStyles();
-  const [comments, setCommets] = useState([1,2,3,4]);
-  const [comment, setCommet] = useState('');
-  const user = JSON.parse(localStorage.getItem('user'));
-  const dispatch = useDispatch();
+  console.log('commentSection', {post});
+  const user = JSON.parse(localStorage.getItem('profile'));
+  console.log('user D1:', {user});
 
-  const handleClick = () => {
+  const [comments, setCommets] = useState(post?.comments);
+  const [comment, setCommet] = useState('');
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const commentsRef = useRef();
+
+  const handleClick = async () => {
     const finalComment = `${user.result.name}: ${comment}`;
-    dispatch(commentPost(finalComment, post._id));
+    console.log('A1', finalComment);
+    const newComments = await dispatch(commentPost(finalComment, post._id));
+
+    setCommets(newComments);
+    setCommet('');
+
+    commentsRef.current.scrollIntoView({ behavior: 'smooth'})
   }
+
+  console.log({comments});
 
   return (
     <div>
       <div className={classes.commentsOuterContainer}>
         <div className={classes.commentsInnerContainer}>
             <Typography gutterBottom variant='h6'>Comments</Typography>
-            {comments.map((c,i) => (
-              <Typography key={i} gutterBottom variant='subtitle1'>
-                Comment {i}
-              </Typography>
-            ))}
+            {comments?.map((c,i) => {
+              console.log({c});
+              return (
+                <Typography key={i} gutterBottom variant='subtitle1'>
+                  <strong>{c.split(': ')[0]}</strong>
+                  {c.split(':')[1]} 
+                </Typography>
+              )}
+            )}
+            <div ref={commentsRef}/>
         </div>
+        {user.result.name && (
+          <div style={{ width: '70%'}}>
+            <Typography gutterBottom variant='h6'>Write a comment</Typography>
+            <TextField 
+              fullWidth
+              minRows={4}
+              variant='outlined'
+              label='Comment'
+              multiline
+              value={comment}
+              onChange={(e) => setCommet(e.target.value)}
+              />
+            <Button style={{ marginTop: '10px'}} fullWidth disabled={!comment} variant="contained" onClick={handleClick}>
+              Comment
+            </Button>
+          </div>
+        )}
       </div>
-      {user.result.name && (
-        <div style={{ width: '70%'}}>
-          <Typography gutterBottom variant='h6'>Write a comment</Typography>
-          <TextField 
-            fullWidth
-            minRows={4}
-            variant='outlined'
-            label='Comment'
-            multiline
-            value={comment}
-            onChange={(e) => setCommet(e.target.value)}
-            />
-          <Button style={{ marginTop: '10px'}} fullWidth disabled={!comment} variant="contained" onClick={handleClick}>
-            Comment
-          </Button>
-        </div>
-      )}
     </div>
   )
 }
